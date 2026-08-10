@@ -1,4 +1,4 @@
-# ResolutionSelector Zerohackz
+# ComfyUI-ResolutionSelector
 
 A lightweight ComfyUI custom node that outputs width, height, and frame count for MiniMax H3, driven by three simple widgets.
 
@@ -36,7 +36,7 @@ All are multiples of 32, sized for MiniMax H3's canvas constraint (`width % 32 =
 
 ```powershell
 cd E:\ComfyUI\custom_nodes
-git clone https://github.com/Zerohackz/ResolutionSelector_Zerohackz
+git clone https://github.com/Zerohackz/ComfyUI-ResolutionSelector
 ```
 
 Or via ComfyUI-Manager (once listed). Restart ComfyUI. The node appears under the `ResolutionSelector_Zerohackz` category.
