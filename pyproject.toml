@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-resolution-selector"
+description = "Quick resolution, orientation, and duration selector for MiniMax H3. Outputs width, height, and frame count as integers."
+version = "1.0.0"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Zerohackz/ComfyUI-ResolutionSelector"
+
+[tool.comfy]
+PublisherId = "zerohackz"
+DisplayName = "ComfyUI-ResolutionSelector"
+Icon = ""

@@ -1,0 +1,127 @@
+{
+  "id": "resolution-selector-example",
+  "revision": 0,
+  "last_node_id": 5,
+  "last_link_id": 6,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "ResolutionSelectorZerohackz",
+      "pos": [40, 40],
+      "size": [360, 150],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        { "name": "width",  "type": "INT", "links": [1] },
+        { "name": "height", "type": "INT", "links": [2] },
+        { "name": "length", "type": "INT", "links": [3] }
+      ],
+      "title": "ResolutionSelector_Zerohackz",
+      "properties": {
+        "Node name for S&R": "ResolutionSelectorZerohackz"
+      },
+      "widgets_values": ["landscape", "480P", 5]
+    },
+    {
+      "id": 2,
+      "type": "Note",
+      "pos": [40, 220],
+      "size": [360, 120],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "How to use",
+      "properties": {},
+      "widgets_values": [
+        "Wire the three outputs (width, height, length) into MiniMaxH3ImageToVideo's corresponding inputs.  To expose the inputs on MiniMaxH3ImageToVideo, right-click the node and convert the prompt/width/height/length widgets to node inputs."
+      ]
+    },
+    {
+      "id": 3,
+      "type": "ClipProjLoader",
+      "pos": [440, 40],
+      "size": [380, 130],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        { "name": "CLIP", "type": "CLIP", "links": [4] }
+      ],
+      "title": "ClipProj Encoder (4B Qwen3-VL)",
+      "properties": {
+        "Node name for S&R": "ClipProjLoader"
+      },
+      "widgets_values": [
+        "qwen3vl_4b_fp8_scaled.safetensors",
+        "auto",
+        "mmh3-4b-ClipProj-celeb-mlp.safetensors",
+        "cuda:1",
+        "resident"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [440, 210],
+      "size": [380, 60],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        { "name": "VAE", "type": "VAE", "links": [5] }
+      ],
+      "title": "Video VAE",
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": ["minimax_h3_video_vae_fp16.safetensors"]
+    },
+    {
+      "id": 5,
+      "type": "MiniMaxH3ImageToVideo",
+      "pos": [440, 310],
+      "size": [460, 260],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        { "name": "clip",   "type": "CLIP",  "link": 4 },
+        { "name": "vae",    "type": "VAE",   "link": 5 },
+        { "name": "width",  "type": "INT",   "link": 1 },
+        { "name": "height", "type": "INT",   "link": 2 },
+        { "name": "length", "type": "INT",   "link": 3 }
+      ],
+      "outputs": [
+        { "name": "positive", "type": "CONDITIONING", "links": null },
+        { "name": "LATENT",   "type": "LATENT",       "links": null }
+      ],
+      "title": "MiniMaxH3ImageToVideo (wired to selector)",
+      "properties": {
+        "Node name for S&R": "MiniMaxH3ImageToVideo"
+      },
+      "widgets_values": [
+        "your prompt here",
+        864,
+        480,
+        124
+      ]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 5, 2, "INT"],
+    [2, 1, 1, 5, 3, "INT"],
+    [3, 1, 2, 5, 4, "INT"],
+    [4, 3, 0, 5, 0, "CLIP"],
+    [5, 4, 0, 5, 1, "VAE"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
