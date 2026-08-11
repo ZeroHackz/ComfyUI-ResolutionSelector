@@ -18,11 +18,11 @@
         { "name": "height", "type": "INT", "links": [2] },
         { "name": "length", "type": "INT", "links": [3] }
       ],
-      "title": "ResolutionSelector_Zerohackz",
+      "title": "MiniMax H3 Resolution Selector (ZeroHackz)",
       "properties": {
         "Node name for S&R": "ResolutionSelectorZerohackz"
       },
-      "widgets_values": ["landscape", "480P", 5]
+      "widgets_values": ["landscape", "0.4 (864x480)", 5]
     },
     {
       "id": 2,

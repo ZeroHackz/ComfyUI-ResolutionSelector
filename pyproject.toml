@@ -10,5 +10,5 @@ Repository = "https://github.com/Zerohackz/ComfyUI-ResolutionSelector"
 
 [tool.comfy]
 PublisherId = "zerohackz"
-DisplayName = "ComfyUI-ResolutionSelector"
+DisplayName = "MiniMax H3 - Resolution Selector (ZeroHackz)"
 Icon = ""
