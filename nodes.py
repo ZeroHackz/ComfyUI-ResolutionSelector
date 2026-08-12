@@ -129,14 +129,20 @@ class ImageRatioSelectorZerohackz:
         idx = max(0, min(scale_stop, len(scales) - 1))
         k, w, h = scales[idx]
         mp = w * h / 1_000_000
-        mark = " [original]" if k == k_orig else ""
-        LOG.info(
-            "ImageRatio: %dx%d → k=%d → %dx%d (%.2f MP)%s "
-            "(%d scales, stop %d/%d)",
-            w_img, h_img, k, w, h, mp, mark,
-            len(scales), idx, len(scales) - 1)
+
+        lines = ["Source: %dx%d  |  %d scales  |  slider: %d/%d" %
+                 (w_img, h_img, len(scales), idx, len(scales) - 1), ""]
+        for i, (sk, sw, sh) in enumerate(scales):
+            smp = sw * sh / 1_000_000
+            marker = " ◄ current" if i == idx else ""
+            tag = " [original]" if sk == k_orig else ""
+            lines.append("  %d: %dx%d  (%.2f MP)%s%s" %
+                         (i, sw, sh, smp, tag, marker))
+
+        info = "\n".join(lines)
+        LOG.info("ImageRatio: %dx%d → %dx%d (%.2f MP, k=%d)",
+                 w_img, h_img, w, h, mp, k)
         length = snap_frames(duration * FPS)
-        info = "%dx%d (%.2f MP, k=%d)" % (w, h, mp, k)
         return (w, h, length, info)
 
 
