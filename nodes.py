@@ -1,10 +1,13 @@
 """
 ResolutionSelector_Zerohackz
 
-Single node that outputs width, height, and frame count for MiniMax H3.
-Pick orientation, megapixels, and duration; the node handles the resolution
-lookup, aspect flip, and 17k+5 frame grid snapping for you.
+Nodes for MiniMax H3 resolution and duration selection.
 """
+
+import math
+import logging
+
+import torch
 
 RESOLUTIONS = {
     "0.2 (608x352)":   (608, 352),
@@ -25,12 +28,34 @@ RESOLUTIONS = {
 
 FPS = 24
 
+LOG = logging.getLogger("ResolutionSelector")
+
 
 def snap_frames(n):
     """Snap a frame count up to MiniMax H3's 17k+5 grid."""
     while n % 17 != 5:
         n += 1
     return n
+
+
+def _exact_ratio_scales(w, h):
+    """Return all valid (k, width, height) scales at the exact W:H ratio.
+
+    Both output dimensions are guaranteed divisible by 32 for every entry.
+    k_current is the index of the original size.
+    """
+    w = max(32, (w // 32) * 32)
+    h = max(32, (h // 32) * 32)
+    g = math.gcd(w // 32, h // 32)
+    u_w = (w // 32) // g
+    u_h = (h // 32) // g
+    k_current = g
+    scales = []
+    for k in range(1, k_current + 9):
+        out_w = u_w * k * 32
+        out_h = u_h * k * 32
+        scales.append((k, out_w, out_h))
+    return scales, k_current
 
 
 class ResolutionSelectorZerohackz:
@@ -68,10 +93,59 @@ class ResolutionSelectorZerohackz:
         return (w, h, length)
 
 
+class ImageRatioSelectorZerohackz:
+    """From an image, output width/height/length at exact ratio scales.
+
+    Wire an image in, pick a scale stop with the slider, and the node
+    outputs dimensions that preserve the exact W:H ratio while staying
+    divisible by 32.  The slider centre is the original image size;
+    left = smaller, right = bigger.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE", {
+                    "tooltip": "Source image whose ratio is preserved."}),
+                "scale_stop": ("INT", {
+                    "default": 5, "min": 0, "max": 15, "step": 1,
+                    "tooltip": "0=smallest ... centre=original ... N=bigger"}),
+                "duration": ("INT", {
+                    "default": 5, "min": 2, "max": 10, "step": 1}),
+            },
+        }
+
+    RETURN_TYPES = ("INT", "INT", "INT", "STRING")
+    RETURN_NAMES = ("width", "height", "length", "info")
+    FUNCTION = "resolve"
+    CATEGORY = "MiniMax H3/ZeroHackz"
+    DESCRIPTION = ("Exact-ratio image scaler for MiniMax H3. "
+                   "All outputs are multiples of 32.")
+
+    def resolve(self, image, scale_stop, duration):
+        h_img, w_img = int(image.shape[1]), int(image.shape[2])
+        scales, k_orig = _exact_ratio_scales(w_img, h_img)
+        idx = max(0, min(scale_stop, len(scales) - 1))
+        k, w, h = scales[idx]
+        mp = w * h / 1_000_000
+        mark = " [original]" if k == k_orig else ""
+        LOG.info(
+            "ImageRatio: %dx%d → k=%d → %dx%d (%.2f MP)%s "
+            "(%d scales, stop %d/%d)",
+            w_img, h_img, k, w, h, mp, mark,
+            len(scales), idx, len(scales) - 1)
+        length = snap_frames(duration * FPS)
+        info = "%dx%d (%.2f MP, k=%d)" % (w, h, mp, k)
+        return (w, h, length, info)
+
+
 NODE_CLASS_MAPPINGS = {
     "ResolutionSelectorZerohackz": ResolutionSelectorZerohackz,
+    "ImageRatioSelectorZerohackz": ImageRatioSelectorZerohackz,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "ResolutionSelectorZerohackz": "MiniMax H3 Resolution Selector (ZeroHackz)",
+    "ImageRatioSelectorZerohackz": "MiniMax H3 Ratio from Image (ZeroHackz)",
 }
