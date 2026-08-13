@@ -38,11 +38,12 @@ def snap_frames(n):
     return n
 
 
-def _exact_ratio_scales(w, h):
+def _exact_ratio_scales(w, h, max_mp=2.0):
     """Return all valid (k, width, height) scales at the exact W:H ratio.
 
-    Both output dimensions are guaranteed divisible by 32 for every entry.
-    k_current is the index of the original size.
+    Both output dimensions are guaranteed divisible by 32 for every entry,
+    and every entry stays at or below max_mp megapixels. k_current is the k
+    value of the original size (only present in the list if it fits).
     """
     w = max(32, (w // 32) * 32)
     h = max(32, (h // 32) * 32)
@@ -51,10 +52,14 @@ def _exact_ratio_scales(w, h):
     u_h = (h // 32) // g
     k_current = g
     scales = []
-    for k in range(1, k_current + 9):
+    k = 1
+    while True:
         out_w = u_w * k * 32
         out_h = u_h * k * 32
+        if (out_w * out_h) / 1_000_000 > max_mp:
+            break
         scales.append((k, out_w, out_h))
+        k += 1
     return scales, k_current
 
 
@@ -98,8 +103,7 @@ class ImageRatioSelectorZerohackz:
 
     Wire an image in, pick a scale stop with the slider, and the node
     outputs dimensions that preserve the exact W:H ratio while staying
-    divisible by 32.  The slider centre is the original image size;
-    left = smaller, right = bigger.
+    divisible by 32. Every offered scale is at or below 2 megapixels.
     """
 
     @classmethod
@@ -109,8 +113,9 @@ class ImageRatioSelectorZerohackz:
                 "image": ("IMAGE", {
                     "tooltip": "Source image whose ratio is preserved."}),
                 "scale_stop": ("INT", {
-                    "default": 5, "min": 0, "max": 15, "step": 1,
-                    "tooltip": "0=smallest ... centre=original ... N=bigger"}),
+                    "default": 0, "min": 0, "max": 10, "step": 1,
+                    "tooltip": "Pick a scale from the menu (all ≤ 2 MP). "
+                               "Higher = bigger."}),
                 "duration": ("INT", {
                     "default": 5, "min": 2, "max": 10, "step": 1}),
             },
