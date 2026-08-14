@@ -69,7 +69,7 @@ class ResolutionSelectorZerohackz:
     Widgets:
         orientation — landscape (default) or portrait
         megapixels  — resolution tier from 0.2 MP to 2.0 MP
-        duration    — seconds, 2–10 (default 5)
+        duration    — seconds, 2–30 (default 5)
     """
 
     @classmethod
@@ -79,7 +79,7 @@ class ResolutionSelectorZerohackz:
             "required": {
                 "orientation": (["landscape", "portrait"], {"default": "landscape"}),
                 "megapixels": (mp_options, {"default": "0.4 (864x480)"}),
-                "duration": ("INT", {"default": 5, "min": 2, "max": 10, "step": 1}),
+                "duration": ("INT", {"default": 5, "min": 2, "max": 30, "step": 1}),
             },
         }
 
@@ -117,7 +117,7 @@ class ImageRatioSelectorZerohackz:
                     "tooltip": "Pick a scale from the menu (all ≤ 2 MP). "
                                "Higher = bigger."}),
                 "duration": ("INT", {
-                    "default": 5, "min": 2, "max": 10, "step": 1}),
+                    "default": 5, "min": 2, "max": 30, "step": 1}),
             },
         }
 
