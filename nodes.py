@@ -113,9 +113,9 @@ class ImageRatioSelectorZerohackz:
                 "image": ("IMAGE", {
                     "tooltip": "Source image whose ratio is preserved."}),
                 "scale_stop": ("INT", {
-                    "default": 0, "min": 0, "max": 10, "step": 1,
+                    "default": 0, "min": 0, "max": 512, "step": 1,
                     "tooltip": "Pick a scale from the menu (all ≤ 2 MP). "
-                               "Higher = bigger."}),
+                               "Higher = bigger. Clamped to available scales."}),
                 "duration": ("INT", {
                     "default": 5, "min": 2, "max": 30, "step": 1}),
             },
